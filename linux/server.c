@@ -18,7 +18,7 @@
 #include <my_global.h>
 #include <mysql.h>
 
-#define USERNAME "dummy"
+#define USERNAME "dummy"    //MySql details
 #define PASSWORD "dummy"
 
 #define PORT "42069"  // the port users will be connecting to
