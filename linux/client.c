@@ -14,6 +14,8 @@
 
 #include <arpa/inet.h>
 
+#define CLEAR memset(msg,0,sizeof(msg))
+
 #define PORT "42069" // the port client will be connecting to 
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
@@ -21,15 +23,21 @@
 
 int sendall(int s, char *buf, int *len)
 {
+    printf("Sending %s\n",buf);
+    //sleep(1);
+    *len=strlen(buf);
     int total = 0;        // how many bytes we've sent
     int bytesleft = *len; // how many we have left to send
     int n;
+
+    printf("1\n");
 
     while(total < *len) {
         n = send(s, buf+total, bytesleft, 0);
         if (n == -1) { break; }
         total += n;
         bytesleft -= n;
+        printf("2\n");
     }
 
     *len = total; // return number actually sent here
@@ -94,62 +102,97 @@ int main(int argc, char *argv[])
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
     printf("client: connecting to %s\n", s);
-    printf("HELO COMING\n");
     freeaddrinfo(servinfo); // all done with this structure
+
+
     int size;  
-    printf("HELO COMING\n");
-    char msg[200]="HELO";
-    size=strlen(msg);
+
+
+    char msg[200];
+    strcpy(msg,"HELO");
     sendall(sockfd, msg, &size );
 
-        printf("Mail FROM COMING\n");
-    sleep(1);
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"MAIL FROM:<a@a.a>");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-        printf("RCPT TO COMING\n");
-    sleep(1);
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"RCPT TO:<b@b.b>");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-        printf("RCPT TO2 COMING\n");
-    sleep(1);
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"RCPT TO:<c@c.c>");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-        printf("DATA COMING\n");
-    sleep(1);
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"DATA");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-    printf("M1 COMING\n");
-    sleep(1);
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"dslfnslfbekfb  fjds fdsk fkfds \r\n");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-    printf("M2 COMING\n");
-    sleep(1);
+
+    CLEAR;
+
     strcpy(msg,"fsdfdsfdsfsf  fdsfdsf \r\n");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-    printf("M3 COMING\n");
-    sleep(1);
+
+    CLEAR;
+
     strcpy(msg,"dsafnldsfn fkds vkdsj vkds f\r\n");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-    sleep(1);
+
+    CLEAR;
+
     strcpy(msg,".\r\n");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
-    sleep(1);
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
+    CLEAR;
+
     strcpy(msg,"SEND");
-    size=strlen(msg);
     sendall(sockfd, msg, &size );
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+    printf("Received %s\n", msg);
+
     sleep(4);
-    buf[numbytes] = '\0';
-
-    printf("client: received '%s'\n",buf);
-
     close(sockfd);
 
     return 0;
