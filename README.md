@@ -2,10 +2,20 @@
 
 **Setup**
 
-First change the top macro definitions in server.c
+Copy the contents of the server folder to
+```
+/var/www/html/smtp/
+```
+
+change the top macro definitions in server.c
 ```
 #define USERNAME "dummy"
 #define PASSWORD "dummy"
+```
+and the top macro definitions in recieve.php
+```
+define('DB_USER', '');
+define('DB_PASSWORD', '');
 ```
 
 Create a Database name mails in your MySql server
@@ -31,12 +41,21 @@ OR
 
 You can even Telnet to the server though some commands may malfunction
 ```
-telnet localhost 22
+telnet localhost 42069
 ```
 OR
 ```
-telnet <SERVER IP> 22
+telnet <SERVER IP> 42069
 ```
+The server by default runs on port 42069 but this can be changed by changing 
+```
+#define PORT 42069
+```
+in server.c, client.c and 
+```
+define("PORT", 42069);
+```
+in runner.php
 
 Following commands have been implemented-
 ```
@@ -50,6 +69,6 @@ NOOP
 QUIT
 ```
 
-Frontend is currently in the making!
+~~Frontend is currently in the making!~~
 
 PS- you will see a LOT of debug messages on the server terminal so kindly ignore them for now

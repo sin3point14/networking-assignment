@@ -1,5 +1,9 @@
 <?php
 session_start();
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'mails');
+define('DB_USER', '');
+define('DB_PASSWORD', '');
 ?>
 <html>
 
@@ -42,10 +46,6 @@ session_start();
                 $_SESSION['email']=str_replace("@","_at_",$_SESSION['email']);
                 echo "<h3> MAILBOX OF ".$_SESSION['email']."</h3><hr>";
             }
-            define('DB_HOST', 'localhost');
-            define('DB_NAME', 'mails');
-            define('DB_USER', 'user');
-            define('DB_PASSWORD', 'lolololol');
             $con = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) or die("Failed to connect to MySQL: " . mysqli_error());
             if (mysqli_connect_errno()) {
                 echo "Failed to connect to MySQL: " . mysqli_connect_error();

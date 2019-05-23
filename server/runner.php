@@ -2,9 +2,6 @@
 define("PORT", 42069);
 error_reporting(-1);
 session_start();
-//$output = shell_exec('./client localhost');
-//$output2 = shell_exec('./test');
-//echo 'lolololol';//.$output.$output2;
 $perfect=array("HELO" => "250","DATA" => "354","SEND" => "250","QUIT" => "251");
 
 $fp = fsockopen("localhost", constant("PORT"), $errno, $errstr);
@@ -15,6 +12,7 @@ function transaction($l){
     socket_send($GLOBALS['socket'], $l, strlen($l), 0);
     socket_recv($GLOBALS['socket'], $lol, 3,0);
     echo "SMTP SERVER: ".$lol."<br><br>";
+    //NOT THE SUCCESS RESPONSE CODE
     if(($lol!="250") and ($lol!=$GLOBALS['perfect'][$l])){
         socket_close($GLOBALS['socket']);
         echo "Disconnecting...";
