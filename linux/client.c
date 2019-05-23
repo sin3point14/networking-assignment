@@ -30,14 +30,11 @@ int sendall(int s, char *buf, int *len)
     int bytesleft = *len; // how many we have left to send
     int n;
 
-    printf("1\n");
-
     while(total < *len) {
         n = send(s, buf+total, bytesleft, 0);
         if (n == -1) { break; }
         total += n;
         bytesleft -= n;
-        printf("2\n");
     }
 
     *len = total; // return number actually sent here
@@ -107,6 +104,7 @@ int main(int argc, char *argv[])
 
     int size;  
 
+    //TRY EDITING THE COMMANDS BELLOW
 
     char msg[200];
     strcpy(msg,"HELO");
@@ -119,6 +117,8 @@ int main(int argc, char *argv[])
 
     CLEAR;
 
+    sleep(1);
+
     strcpy(msg,"MAIL FROM:<a@a.a>");
     sendall(sockfd, msg, &size );
 
@@ -126,6 +126,8 @@ int main(int argc, char *argv[])
 
     recv(sockfd, msg, 5, 0);
     printf("Received %s\n", msg);
+
+    sleep(1);
 
     CLEAR;
 
@@ -137,6 +139,8 @@ int main(int argc, char *argv[])
     recv(sockfd, msg, 5, 0);
     printf("Received %s\n", msg);
 
+    sleep(1);
+
     CLEAR;
 
     strcpy(msg,"RCPT TO:<c@c.c>");
@@ -146,6 +150,8 @@ int main(int argc, char *argv[])
 
     recv(sockfd, msg, 5, 0);
     printf("Received %s\n", msg);
+
+    sleep(1);
 
     CLEAR;
 
@@ -157,20 +163,28 @@ int main(int argc, char *argv[])
     recv(sockfd, msg, 5, 0);
     printf("Received %s\n", msg);
 
+    sleep(1);
+
     CLEAR;
 
     strcpy(msg,"dslfnslfbekfb  fjds fdsk fkfds \r\n");
     sendall(sockfd, msg, &size );
+
+    sleep(1);
 
     CLEAR;
 
     strcpy(msg,"fsdfdsfdsfsf  fdsfdsf \r\n");
     sendall(sockfd, msg, &size );
 
+    sleep(1);
+
     CLEAR;
 
     strcpy(msg,"dsafnldsfn fkds vkdsj vkds f\r\n");
     sendall(sockfd, msg, &size );
+
+    sleep(1);
 
     CLEAR;
 
@@ -182,6 +196,8 @@ int main(int argc, char *argv[])
     recv(sockfd, msg, 5, 0);
     printf("Received %s\n", msg);
 
+    sleep(1);
+
     CLEAR;
 
     strcpy(msg,"SEND");
@@ -190,9 +206,18 @@ int main(int argc, char *argv[])
     CLEAR;
 
     recv(sockfd, msg, 5, 0);
-    printf("Received %s\n", msg);
 
-    sleep(4);
+    sleep(1);
+
+    strcpy(msg,"QUIT");
+    sendall(sockfd, msg, &size );
+
+    CLEAR;
+
+    recv(sockfd, msg, 5, 0);
+
+    sleep(1);
+
     close(sockfd);
 
     return 0;

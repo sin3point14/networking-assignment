@@ -27,7 +27,10 @@
 
 #define MAXMSGLENGTH 500 //maximum message length to be recv() by server
 
-#define SENDMESSAGE(x,y) if(send(new_fd, (x), (y), 0) == -1) break
+#define SENDMESSAGE(x,y) if(send(new_fd, (x), (y), 0) == -1) \
+                            break; \
+                         else \
+                            printf("SENDING %s\n",(x))
 
 #define SENDCODE(x) SENDMESSAGE((x),3)
 
@@ -67,20 +70,12 @@ bool maddrprocess(char *buff, int pre, char* dest)
     int at=0,period=0;
     int len=strlen(buff);
     if(buff[pre]!='<'&&buff[len-3]!='>')
-    {
-        printf("returning on bracket check");
         return 0;
-    }
     if(buff[len-4]=='.')
-    {
-        printf("returning on spl period check");
         return 0;
-    }
-    printf("i barrier %d\n", len-pre-2);
     int y=pre+1;
     int i=0;
     for(;i<(len-pre-2);i++,y++){
-        printf("%d\n",buff[y]);
         if((buff[y]>='a'&&buff[y]<='z')||(buff[y]>='A'&&buff[y]<='Z')||(buff[y]>='0'&&buff[y]<='9')){
             dest[i]=buff[y];
             continue;
@@ -94,24 +89,14 @@ bool maddrprocess(char *buff, int pre, char* dest)
             dest[i]=buff[y];
         }
         else
-        {
-            printf("returning on email check");
             return 0;
-        }
     }
     dest[i]=0;
     buff[y]=0;
-    printf("returning 1");
-    if(at==1&&period==1){
-        printf("returning 1");
+    if(at==1&&period==1)
         return 1; 
-        
-    }
-    else{
-        printf("returning 0");
+    else
         return 0; 
-        
-    }
 }
 
 
@@ -241,15 +226,10 @@ int main(void)
             s, sizeof s);
         printf("server: got connection from %s\n", s);
         int lol=fork();
-        printf("fork- %d\n",lol);
         if (lol==0) { // this is the child process  TODO: add a function to delete pointers on conn failure/quit
-            printf("fork ke andar\n"); //CHECK KARNE KE LIYE
             int nbytes=0;
             bool helo=0;
             char buff[MAXMSGLENGTH*2];
-            //buff.start=0;
-            //buff.end=0;
-            //char tbuff[MAXMSGLENGTH];
             char mailFrom[51];
             char **recipients=NULL;
             int nrecipients=0;
@@ -260,7 +240,6 @@ int main(void)
             while ((nbytes>0||(helo==0&&nbytes==0))&&quit){
                 if ((nbytes = recv(new_fd, buff, MAXMSGLENGTH*2, 0)) <= 0) {
                     // got error or connection closed by client
-                    printf("sent msg- %x%x \n",buff, nbytes); //CHECK KARNE KE LIYE
                     if (nbytes == 0) {
                        // connection closed
                         printf("server: socket %d hung up\n", new_fd);
@@ -271,10 +250,9 @@ int main(void)
                     }
                 }
                 else{
-                    printf("sent msg- %d %d %d %d %d %d \n",buff[0],buff[1],buff[2],buff[3],buff[4],buff[5]); //CHECK KARNE KE LIYE
-                    printf("buffer- %s\n",buff);
+                    printf("RECEIVED %s\n",buff);
                     if(helo==0){
-                       if(!prefix("HELO",buff)){
+                       if(!prefix("HELO",buff)){ 
                            perror("server: client didn't identify using HELO");
                            quit=0;
                         }
@@ -285,26 +263,22 @@ int main(void)
                     }
                     else{
                         if(prefix("MAIL FROM",buff)){
-                            printf("%d\n",nbytes);
-                            if(maddrprocess(buff, 10, mailFrom)){
+                            if(maddrprocess(buff, 10, mailFrom)){//maddrprocess checks if a mail address has valid format and copies it to mailFrom array(in this case)
                                 SENDCODE("250");
                             }
                             else{
                                 mailFrom[0]=0;
                                 SENDCODE("501");
                             }
-                            printf("baahar\n");
-                            printf("baahar %s\n",mailFrom);
-                            printf("mailFrom first char- %d \n",mailFrom[0]);
                         }
                         else if(prefix("RCPT TO",buff)){
-                            
+                            //dynamically allocating memory to recipients
                             if(nrecipients==0){
                                 if(!((recipients = malloc(sizeof(char*)))&&(recipients[0] = malloc((51) * sizeof(char))))){
                                     SENDCODE("452");
                                 }
                                 else {
-                                    if(maddrprocess(buff, 8, recipients[0])){
+                                    if(maddrprocess(buff, 8, recipients[0])){ 
                                         SENDCODE("250");
                                         nrecipients++;
                                     }
@@ -328,7 +302,6 @@ int main(void)
                                     free (recipients[nrecipients]);
                                 }  
                             }
-                            printf("nrecipients- %d",nrecipients);
                         }
                         else if(prefix("DATA",buff)){
                             SENDCODE("354");
@@ -336,7 +309,7 @@ int main(void)
                             char t2buff[200];
                             int tbytes;
                             bool loop=1;
-                            while(loop){
+                            while(loop){    //new input handler so that as the only command accepted inside DATA is RSET
                                 if ((tbytes = recv(new_fd, t2buff, MAXMSGLENGTH*2, 0)) <= 0) {
                                     // got error or connection closed by client
                                     if (tbytes == 0) {
@@ -348,20 +321,12 @@ int main(void)
                                         perror("recv");
                                     }
                                     break;
-                                    //close(i); // bye!
                                 }
                                 else{
-                                    printf("t2buff- %s\n",t2buff);
+                                    //add received data to previous mail data
+                                    printf("RECEIVED- %s\n",t2buff);
                                     int temp=10;
-                                    //for(int s=0;s<temp;s++)
-                                     //   printf("%d ",t2buff[s]);
-                                    //putchar(10);
-                                    //int a=t2buff[0]==46;
-                                    //int b=t2buff[1]==13;
-                                    //int c=t2buff[2]==10;
-                                    //printf("%d %d %d \n",a,b,c);
-                                    if(t2buff[0]=='.'&&t2buff[1]=='\r'&&t2buff[2]=='\n'){
-                                        printf("__END DATA__\n");
+                                    if(t2buff[0]=='.'&&t2buff[1]=='\r'&&t2buff[2]=='\n'){ //checking for .<CRLF>
                                         mailData[count]=0;
                                         t2buff[0]=0;
                                         SENDCODE("250");
@@ -380,43 +345,37 @@ int main(void)
                                         count+=tbytes;
                                     }
                                     strcat(mailData,t2buff);
-                                    printf("mailData- %s   %d\n",mailData,count);
                                     memset(t2buff,0,sizeof(t2buff));
-                                    
-                                    putchar(10);
                                 }
                             }
                         }
-                        else if(prefix("RSET",buff)){
-                            printf("lol\n");
+                        else if(prefix("RSET",buff)){ //freeing pointers and clearing other stuff
                             for(int t=0;t<nrecipients;t++)
                                 free(recipients[t]);
-                            printf("lol\n");
                             if(recipients)
                                 free(recipients);
-                            printf("lol\n");
                             nrecipients=0;
                             mailFrom[0]=0;
                             mailData[0]=0;
-                            printf("lol\n");
                             SENDCODE("250");
-                            printf("lol\n");
                         }
                         else if(prefix("SEND",buff)){
-                            //printf("");
-                            int x=(mailFrom[0]!=0)&&(nrecipients!=0)&&(mailData[0]!=0);
-                            printf("at least %d %d %d",mailFrom[0]!=0,nrecipients!=0,mailData[0]!=0);
                             if(mailFrom[0]!=0&&nrecipients!=0&&mailData[0]!=0){
-                                printf("i'm in\n");
                                 MYSQL *con1=connect_to_mysql();
                                 int z=0;
+                                /*This is my super inefficient database management
+                                  Creates table for every receiver(even if the table exists
+                                  no one cares, it'll only throw an error saying table 
+                                  exists lol) then add an entry of the sender and the mailData
+                                  to that table. All these strcat()s are a result of lack of
+                                  + operator overloading in C  >:(
+                                */
                                 for(;z<nrecipients;z++){
                                     char query[100];
                                     memset(query,0,sizeof(query));
                                     strcpy(query,"CREATE TABLE ");
                                     strcat(query, sanitize_email(recipients[z]));
                                     strcat(query, " (sender varchar(50), mail varchar(255));");
-                                    printf("%s  %s  %s\n",recipients[z],sanitize_email(recipients[z]), query);
                                     mysql_query(con1, query);
                                     fprintf(stderr, "%s\n", mysql_error(con));
                                     strcpy(query,"INSERT INTO ");
@@ -429,7 +388,7 @@ int main(void)
                                     if(mysql_query(con1, query)){
                                         fprintf(stderr, "%s\n", mysql_error(con));
                                         SENDCODE("451");
-                                        for(int k=0;k<=z;k++){
+                                        for(int k=0;k<=z;k++){//in case of an error in any one of the mails being send DELETE ALL MAILS THAT HAVE BEEN SENT
                                             strcpy(query,"DELETE FROM ");
                                             strcat(query, recipients[z]);
                                             strcat(query, " WHERE text='");
@@ -445,7 +404,7 @@ int main(void)
                                         break;
                                     }
                                 }
-                                if(z==nrecipients){
+                                if(z==nrecipients){//ALL MAILS SENT=SUCCESS
                                     SENDCODE("250");
                                 }
                             }
@@ -453,7 +412,7 @@ int main(void)
                                 SENDCODE("501");
                             }
                         }
-                        else if(prefix("VRFY",buff)){
+                        else if(prefix("VRFY",buff)){//VRFY is dangerous therefore not implemented :p
                             SENDCODE("502");
                         }
                         else if(prefix("NOOP",buff)){
@@ -471,7 +430,7 @@ int main(void)
                 }
                 memset(buff,0,sizeof(buff));
             }
-            for(int t=0;t<nrecipients;t++){
+            for(int t=0;t<nrecipients;t++){ //prevent orphan blocks
                 free(recipients[t]);
             }
             free(recipients);            
