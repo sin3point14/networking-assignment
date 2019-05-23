@@ -12,7 +12,7 @@ Create a Database name mails in your MySql server
 
 And compile the files using this command(in the linux floder inside the repo)-
 ```
-gcc -I/usr/include/mysql -o server server.c `mysql_config --cflags --libs` && gcc -o client client.
+gcc -I/usr/include/mysql -o server server.c `mysql_config --cflags --libs` && gcc -o client client.c
 ```
 
 Run Server
@@ -31,11 +31,11 @@ OR
 
 You can even Telnet to the server though some commands may malfunction
 ```
-telnet localhost 42069
+telnet localhost 22
 ```
 OR
 ```
-telnet <SERVER IP> 42069
+telnet <SERVER IP> 22
 ```
 
 Following commands have been implemented-

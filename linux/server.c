@@ -363,6 +363,7 @@ int main(void)
                                     if(t2buff[0]=='.'&&t2buff[1]=='\r'&&t2buff[2]=='\n'){
                                         printf("__END DATA__\n");
                                         mailData[count]=0;
+                                        t2buff[0]=0;
                                         SENDCODE("250");
                                         loop=0;
                                     }
